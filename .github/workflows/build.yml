@@ -1,0 +1,29 @@
+name: Build CoConut
+
+on: [push]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: '2024.04.26'
+
+      - name: Install deps
+        run: vcpkg install sdl2:x64-windows imgui[opengl2-binding,sdl2-binding]:x64-windows
+
+      - name: Configure
+        run: cmake -B build -S. -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoConut-Windows
+          path: build/Release/*.exe

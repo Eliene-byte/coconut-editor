@@ -1,47 +1,49 @@
-﻿#include "imgui.h"
-#include "imgui_impl_sdl2.h"
-#include "imgui_impl_opengl2.h"
+#include <imgui.h>
+#include <imgui_impl_sdl2.h>
+#include <imgui_impl_opengl2.h>
 #include <SDL.h>
-#include "effects.h"
-#include <vector>
-#include <string>
-extern "C" { const char* tinyfd_openFileDialog(const char*,const char*); }
+#ifdef _WIN32
+#include <windows.h>
+#endif
+#include <GL/gl.h>
 
-struct Clip{ std::string file; float pos=0,dur=5; };
-struct Project{ std::vector<Clip> clips; };
-
-int main(){
+int main(int, char**){
     SDL_Init(SDL_INIT_VIDEO);
-    SDL_Window* w=SDL_CreateWindow("CoConut Editor",0,0,1600,900,SDL_WINDOW_OPENGL);
-    SDL_Renderer* r=SDL_CreateRenderer(w,-1,0);
-    auto gl=SDL_GL_CreateContext(w);
-    IMGUI_CHECKVERSION(); ImGui::CreateContext(); ImGui::StyleColorsDark();
-    ImGui_ImplSDL2_InitForOpenGL(w,gl); ImGui_ImplOpenGL2_Init();
+    SDL_Window* window = SDL_CreateWindow("CoConut", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+    SDL_GLContext gl = SDL_GL_CreateContext(window);
 
-    Project p; auto fx=getEffects(); int tab=0; bool run=true;
-    while(run){
-        SDL_Event e; while(SDL_PollEvent(&e)){ ImGui_ImplSDL2_ProcessEvent(&e); if(e.type==SDL_QUIT) run=false; }
-        ImGui_ImplOpenGL2_NewFrame(); ImGui_ImplSDL2_NewFrame(); ImGui::NewFrame();
-        
-        ImGui::SetNextWindowPos({0,0}); ImGui::SetNextWindowSize({1600,900});
-        ImGui::Begin("CoConut",0,ImGuiWindowFlags_NoDecoration);
-        
-        if(ImGui::Button("Timeline")) tab=0; ImGui::SameLine();
-        if(ImGui::Button("Efeitos (500)")) tab=1; ImGui::SameLine();
-        if(ImGui::Button("Textos")) tab=2; ImGui::SameLine();
-        if(ImGui::Button("Cor")) tab=3; ImGui::SameLine();
-        if(ImGui::Button("Export")) tab=4;
-        
-        ImGui::Separator();
-        if(tab==0){
-            if(ImGui::Button("Importar")){ auto f=tinyfd_openFileDialog("Video",""); if(f){ p.clips.push_back({f}); } }
-            for(auto& c:p.clips) ImGui::Text("%s", c.file.c_str());
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui_ImplSDL2_InitForOpenGL(window, gl);
+    ImGui_ImplOpenGL2_Init();
+
+    bool done = false;
+    while(!done){
+        SDL_Event e;
+        while(SDL_PollEvent(&e)){
+            ImGui_ImplSDL2_ProcessEvent(&e);
+            if(e.type == SDL_QUIT) done = true;
         }
-        if(tab==1){ for(auto& e:fx) if(ImGui::Button(e.name.c_str())){} }
-        if(tab==4){ if(ImGui::Button("Exportar MP4")){} }
-        
+        ImGui_ImplOpenGL2_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Begin("CoConut Editor Pro");
+        ImGui::Text("500 Efeitos | Keyframes | Color Grading");
+        ImGui::Separator();
+        if(ImGui::Button("Timeline", {120,40})){}
+        ImGui::SameLine();
+        if(ImGui::Button("Efeitos", {120,40})){}
+        ImGui::SameLine();
+        if(ImGui::Button("Export", {120,40})){}
         ImGui::End();
-        ImGui::Render(); glClear(GL_COLOR_BUFFER_BIT); ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData()); SDL_GL_SwapWindow(w);
+
+        ImGui::Render();
+        glViewport(0,0,1280,720);
+        glClearColor(0.1f,0.1f,0.1f,1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+        SDL_GL_SwapWindow(window);
     }
     return 0;
 }
