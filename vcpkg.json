@@ -1,16 +1,12 @@
 ﻿{
-    "name":  "coconut-editor",
-    "dependencies":  [
-                         "sdl2",
-                         {
-                             "features":  [
-                                              "sdl2-binding",
-                                              "opengl3-binding",
-                                              "docking-experimental"
-                                          ],
-                             "name":  "imgui"
-                         }
-                     ],
-    "version-string":  "0.1.0",
-    "builtin-baseline":  "2023-11-14"
+  "name": "coconut-editor",
+  "version-string": "0.1.0",
+  "builtin-baseline": "2023-11-14",
+  "dependencies": [
+    "sdl2",
+    {
+      "name": "imgui",
+      "features": [ "sdl2-binding", "opengl3-binding", "docking-experimental" ]
+    }
+  ]
 }
