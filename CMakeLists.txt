@@ -1,31 +1,37 @@
-﻿cmake_minimum_required(VERSION 3.21)
-project(CoConutEditor VERSION 0.2.0 LANGUAGES CXX)
+﻿cmake_minimum_required(VERSION 3.20)
+project(CoConutEditor)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+# Baixa dependências automaticamente
+include(FetchContent)
 
-add_executable(CoConutEditor
+# SDL2
+FetchContent_Declare(SDL2 URL https://github.com/libsdl-org/SDL/releases/download/release-2.30.0/SDL2-devel-2.30.0-VC.zip)
+FetchContent_MakeAvailable(SDL2)
+
+# ImGui
+FetchContent_Declare(imgui URL https://github.com/ocornut/imgui/archive/refs/tags/v1.90.9.zip)
+FetchContent_MakeAvailable(imgui)
+
+# FFmpeg (Windows)
+set(FFMPEG_DIR "${CMAKE_SOURCE_DIR}/third_party/ffmpeg")
+
+# Inclui
+include_directories(${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
+include_directories(${SDL2_SOURCE_DIR}/include)
+include_directories(${FFMPEG_DIR}/include)
+
+# Arquivos
+file(GLOB IMGUI_SRC ${imgui_SOURCE_DIR}/*.cpp ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl2.cpp)
+
+add_executable(CoConutEditor 
     src/main.cpp
-    src/mainwindow.cpp
-    src/mainwindow.h
-    src/timelinewidget.h
-    src/timelinewidget.cpp
-    src/clipitem.h
-    src/clipitem.cpp
+    ${IMGUI_SRC}
 )
 
-target_link_libraries(CoConutEditor PRIVATE
-    Qt6::Widgets
+target_link_libraries(CoConutEditor 
+    ${SDL2_SOURCE_DIR}/lib/x64/SDL2.lib
+    ${SDL2_SOURCE_DIR}/lib/x64/SDL2main.lib
+    opengl32
 )
-
-if(WIN32)
-    set_target_properties(CoConutEditor PROPERTIES WIN32_EXECUTABLE ON)
-    add_custom_command(TARGET CoConutEditor POST_BUILD
-        COMMAND ${Qt6_DIR}/../../../bin/windeployqt.exe $<TARGET_FILE:CoConutEditor>
-    )
-endif()
