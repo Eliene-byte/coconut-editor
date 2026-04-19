@@ -1,11 +1,10 @@
 ﻿{
   "name": "coconut-editor",
-  "version-string": "0.1.0",
+  "version": "0.2.0",
   "dependencies": [
-    "sdl2",
     {
-      "name": "imgui",
-      "features": [ "opengl3-binding", "docking-experimental" ]
+      "name": "qtbase",
+      "features": ["widgets"]
     }
   ]
 }
