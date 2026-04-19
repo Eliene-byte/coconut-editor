@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+﻿cmake_minimum_required(VERSION 3.20)
 project(CoConutEditor CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -16,15 +16,16 @@ target_link_libraries(CoConutEditor PRIVATE
     OpenGL::GL
 )
 
-# --- ImGui SDL2 + OpenGL3 backends (vcpkg n�o fornece mais via feature)
+
+# --- ImGui backends (arquivos locais, vcpkg não instala mais)
 find_package(imgui CONFIG REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE imgui::imgui SDL2::SDL2 SDL2::SDL2main)
 
 target_sources(${PROJECT_NAME} PRIVATE
-    ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/imgui/backends/imgui_impl_sdl2.cpp
-    ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/imgui/backends/imgui_impl_opengl3.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui_backends/imgui_impl_sdl2.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui_backends/imgui_impl_opengl3.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/imgui/backends
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui_backends
 )
