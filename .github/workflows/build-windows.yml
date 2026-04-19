@@ -9,18 +9,32 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
+    
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
       with:
         version: '6.7.2'
+        dir: '${{ github.workspace }}/qt'
+        
     - name: Configure CMake
-      run: cmake -B build -S .
+      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}/qt/Qt/6.7.2/msvc2019_64"
+      
     - name: Build
       run: cmake --build build --config Release
+      
+    - name: Deploy Qt
+      shell: pwsh
+      run: |
+        cd build/Release
+        ${{ github.workspace }}\qt\Qt\6.7.2\msvc2019_64\bin\windeployqt.exe --release --no-translations --no-opengl-sw --no-system-d3d-compiler CoConutEditor.exe
+        dir platforms
+        if (-not (Test-Path "platforms/qwindows.dll")) { throw "qwindows.dll nao foi copiado!" }
+        
+    - name: Zip artifact
+      run: 7z a CoConutEditor-Windows.zip ./build/Release/*
+        
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: CoConutEditor-Windows
-        path: |
-          build/Release/CoConutEditor.exe
-          build/Release/*.dll
+        path: CoConutEditor-Windows.zip
