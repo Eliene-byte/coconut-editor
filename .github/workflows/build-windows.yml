@@ -1,4 +1,4 @@
-﻿name: Build CoConut Editor
+﻿name: Build CoConut Editor REAL
 
 on:
   push:
@@ -10,31 +10,52 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Install Qt
+    - name: Install Qt 6.7.2 with Multimedia
       uses: jurplel/install-qt-action@v3
       with:
         version: '6.7.2'
-        dir: '${{ github.workspace }}/qt'
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_msvc2019_64'
+        modules: 'qtmultimedia qt5compat'
+        cache: true
+        
+    - name: Setup MSVC
+      uses: ilammy/msvc-dev-cmd@v1
         
     - name: Configure CMake
-      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}/qt/Qt/6.7.2/msvc2019_64"
+      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$env:Qt6_DIR"
       
     - name: Build
-      run: cmake --build build --config Release
+      run: cmake --build build --config Release --parallel
       
     - name: Deploy Qt
       shell: pwsh
       run: |
         cd build/Release
-        ${{ github.workspace }}\qt\Qt\6.7.2\msvc2019_64\bin\windeployqt.exe --release --no-translations --no-opengl-sw --no-system-d3d-compiler CoConutEditor.exe
-        dir platforms
-        if (-not (Test-Path "platforms/qwindows.dll")) { throw "qwindows.dll nao foi copiado!" }
+        $qtbin = "$env:Qt6_DIR\bin"
+        & "$qtbin\windeployqt.exe" --release --multimedia --multimediawidgets --no-translations --no-opengl-sw CoConutEditor.exe
         
-    - name: Zip artifact
-      run: 7z a CoConutEditor-Windows.zip ./build/Release/*
+        # Copia plugins de midia manualmente (fix comum)
+        Copy-Item "$qtbin\..\plugins\multimedia" -Destination ".\plugins\" -Recurse -Force -ErrorAction SilentlyContinue
+        Copy-Item "$qtbin\..\plugins\mediaservice" -Destination ".\plugins\" -Recurse -Force -ErrorAction SilentlyContinue
         
-    - name: Upload artifact
+    - name: Verify DLLs
+      shell: pwsh
+      run: |
+        cd build/Release
+        dir *.dll
+        if (!(Test-Path "Qt6Multimedia.dll")) { throw "Faltou Qt6Multimedia.dll" }
+        if (!(Test-Path "Qt6MultimediaWidgets.dll")) { throw "Faltou Qt6MultimediaWidgets.dll" }
+        
+    - name: Package
+      run: |
+        cd build
+        7z a -tzip CoConutEditor-v0.1-WIN64.zip Release\*
+        
+    - name: Upload
       uses: actions/upload-artifact@v4
       with:
-        name: CoConutEditor-Windows
-        path: CoConutEditor-Windows.zip
+        name: CoConutEditor-v0.1-WIN64
+        path: build/CoConutEditor-v0.1-WIN64.zip
+        retention-days: 30
