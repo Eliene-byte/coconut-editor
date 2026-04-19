@@ -15,3 +15,16 @@ target_link_libraries(CoConutEditor PRIVATE
     imgui::imgui
     OpenGL::GL
 )
+
+# --- ImGui SDL2 + OpenGL3 backends (vcpkg não fornece mais via feature)
+find_package(imgui CONFIG REQUIRED)
+find_package(SDL2 CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE imgui::imgui SDL2::SDL2 SDL2::SDL2main)
+
+target_sources(${PROJECT_NAME} PRIVATE
+    ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/imgui/backends/imgui_impl_sdl2.cpp
+    ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/imgui/backends/imgui_impl_opengl3.cpp
+)
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/imgui/backends
+)
