@@ -1,7 +1,7 @@
-#include <SDL.h>
+﻿#include <SDL.h>
 #include <imgui.h>
 #include <imgui_impl_sdl2.h>
-#include <imgui_impl_opengl2.h>
+#include <imgui_impl_opengl3.h>
 #include <GL/gl.h>
 
 int main(int, char**) {
@@ -11,7 +11,7 @@ int main(int, char**) {
     
     ImGui::CreateContext();
     ImGui_ImplSDL2_InitForOpenGL(win, ctx);
-    ImGui_ImplOpenGL2_Init();
+    ImGui_ImplOpenGL3_Init();
     
     bool run = true;
     while(run) {
@@ -20,7 +20,7 @@ int main(int, char**) {
             ImGui_ImplSDL2_ProcessEvent(&e);
             if(e.type == SDL_QUIT) run = false;
         }
-        ImGui_ImplOpenGL2_NewFrame();
+        ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
         
@@ -30,8 +30,9 @@ int main(int, char**) {
         
         ImGui::Render();
         glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(win);
     }
     return 0;
 }
+
