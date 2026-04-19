@@ -1,7 +1,6 @@
 ﻿{
   "name": "coconut-editor",
   "version-string": "0.1.0",
-  "builtin-baseline": "2023-11-14",
   "dependencies": [
     "sdl2",
     {
@@ -10,3 +9,4 @@
     }
   ]
 }
+
