@@ -11,7 +11,7 @@ int main(int, char**) {
     
     ImGui::CreateContext();
     ImGui_ImplSDL2_InitForOpenGL(win, ctx);
-    ImGui_ImplOpenGL3_Init();
+    ImGui_ImplOpenGL3_Init("#version 130");
     
     bool run = true;
     while(run) {
