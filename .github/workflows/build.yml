@@ -5,12 +5,49 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
+      
       - name: Install dependencies
         shell: pwsh
         run: vcpkg install --triplet x64-windows
+      
       - name: Configure CMake
         shell: pwsh
         run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
+      
       - name: Build
         shell: pwsh
         run: cmake --build build --config Release
+      
+      - name: Upload exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoConutEditor-windows
+          path: build/Release/CoConutEditor.exe
+' | Set-Content ".github\workflows\build.yml" -Encoding UTFSet-Location "C:\Users\Admin\Downloads\CoConut-Lite-Zero\coconut-editor"
+
+@'
+name: Build Coconut Editor
+on: [push, pull_request]
+jobs:
+  windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        shell: pwsh
+        run: vcpkg install --triplet x64-windows
+      
+      - name: Configure CMake
+        shell: pwsh
+        run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
+      
+      - name: Build
+        shell: pwsh
+        run: cmake --build build --config Release
+      
+      - name: Upload exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoConutEditor-windows
+          path: build/Release/CoConutEditor.exe
