@@ -54,7 +54,7 @@ int main(){
 
         ImGui::Separator();
         if(tab==0){
-            if(ImGui::Button("Importar")){ auto f = tinyfd_openFileDialog("Video","",0,0); if(f){ p.clips.push_back({f}); } }
+            if(ImGui::Button("Importar")){ auto f = tinyfd_openFileDialog("Video",""); if(f){ p.clips.push_back({f}); } }
             for(auto& c : p.clips) ImGui::Text("%s", c.file.c_str());
         }
         if(tab==1){ 
